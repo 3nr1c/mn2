@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 
 #define NUM 1000000
-#define MAX_ERROR 10e-15
+#define MAX_ERROR 10e-16
+#define TEST_ERROR 2
 
 double norma_inf_vect(double *v) {
 	int i = 0;
@@ -22,7 +24,7 @@ void fillB_J(double *b)
 	int i;
 	for (i = 0; i < NUM; i++) {
 		if (!(i % 2)) {
-			b[i] = (double)(i+2) / (double)(NUM * (!(i % 2) ? 3 : 4));
+			b[i] = (double)(i+2) / (double)(NUM * (1 + i % 2 ? 3 : 4));
 			b[i+1] = (double)(i+2) / (double)(NUM * (i % 2 ? 3 : 4));
 		}
 	}
@@ -57,11 +59,11 @@ int main()
 
 	// actual iteration
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
 		// printf("Starting iteration %d\n", k+1);
 
 		for (i = 0; i < NUM; i++) {
-			divider = (double)(!(i % 2) ? 3 : 4);
+			divider = (double)(1 + i % 2 ? 3 : 4);
 
 			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
@@ -88,6 +90,28 @@ int main()
 	for (i = 0; i < NUM; i++) {
 		printf("%.12lf\n", x_k[i]);
 	}
+
+	//test
+	for (i = 0; i < NUM; i++) {
+		divider = (double)(!(i % 2) ? 3 : 4);
+
+		error_vect[i] = b[i] - divider * x_k[i];
+		if (i + 2 < NUM)
+			error_vect[i] += x_k[i+2];
+		if (i - 2 < NUM)
+			error_vect[i] += x_k[i-2];
+
+		if (i == 0)
+			error_vect[i] -= x_k[NUM - 2];
+		if (i == 1)
+			error_vect[i] -= x_k[NUM - 1];
+
+		if (i == NUM - 2)
+			error_vect[i] -= x_k[0];
+		if (i == NUM - 1)
+			error_vect[i] -= x_k[1];
+	}
+	assert(norma_inf_vect(error_vect) < TEST_ERROR);
 
 	free(x_k);
 	free(x_k_1);
