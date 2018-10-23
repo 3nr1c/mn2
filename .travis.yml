@@ -1,0 +1,13 @@
+language: c
+os:
+ - linux
+ - osx
+
+script:
+ - cd linear-systems
+ - mkdir build-results
+ - make jacobi
+ - make gs
+ - ./jacobi > build-results/jacobi.txt
+ - ./gs > build-results/gs.txt
+ - diff build-results/jacobi.txt build-results/gs.txt
