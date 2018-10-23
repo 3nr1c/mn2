@@ -9,7 +9,7 @@ void fillB_J(double *b)
 	int i;
 	for (i = 0; i < NUM; i++) {
 		if (!(i % 2)) {
-			b[i] = (double)(i+2) / (double)(NUM * (i % 2 ? 3 : 4));
+			b[i] = (double)(i+2) / (double)(NUM * (!(i % 2) ? 3 : 4));
 			b[i+1] = (double)(i+2) / (double)(NUM * (i % 2 ? 3 : 4));
 		}
 	}
@@ -43,7 +43,7 @@ int main()
 		// printf("Starting iteration %d\n", k+1);
 
 		for (i = 0; i < NUM; i++) {
-			divider = (double)(i % 2 ? 3 : 4);
+			divider = (double)(!(i % 2) ? 3 : 4);
 
 			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
@@ -67,7 +67,7 @@ int main()
 
 	// print start of b
 	for (i = 0; i < NUM; i++) {
-		printf("%.12lf\n", x_k_1[i]);
+		printf("%.12lf\n", x_k[i]);
 	}
 
 	free(x_k);
