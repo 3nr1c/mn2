@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define NUM 1000000
-#define MAX_ERROR 10e-12
+#define MAX_ERROR 10e-15
 
 double norma_inf_vect(double *v) {
 	int i = 0;
