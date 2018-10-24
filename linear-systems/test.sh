@@ -1,6 +1,5 @@
-make jacobi
-make gs
-./jacobi > jacobi.txt
-./gs > gs.txt
+make linear
+
+./linear
 
 diff jacobi.txt gs.txt
