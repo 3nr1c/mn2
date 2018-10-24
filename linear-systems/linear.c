@@ -106,21 +106,23 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(1 + i % 2 ? 3 : 4);
 
-			x_k_1[i] = b[i] / divider;
+			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
-				x_k_1[i] += x_k[i-2] / divider;
+				x_k_1[i] += x_k[i-2];
 			if (i + 2 < NUM)
-				x_k_1[i] += x_k[i+2] / divider;
+				x_k_1[i] += x_k[i+2];
 
 			if (i == 0)
-				x_k_1[i] += -x_k[NUM - 2] / divider;
+				x_k_1[i] += -x_k[NUM - 2];
 			if (i == 1)
-				x_k_1[i] += -x_k[NUM - 1] / divider;
+				x_k_1[i] += -x_k[NUM - 1];
 
 			if (i == NUM - 2)
-				x_k_1[i] += -x_k[0] / divider;
+				x_k_1[i] += -x_k[0];
 			if (i == NUM - 1)
-				x_k_1[i] += -x_k[1] / divider;
+				x_k_1[i] += -x_k[1];
+
+			x_k_1[i] /= divider;
 
 			error_vect[i] = x_k_1[i] - x_k[i];
 		}
@@ -148,19 +150,23 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(1 + i % 2 ? 3 : 4);
 
-			x_k_1[i] = b[i] / divider;
+			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
-				x_k_1[i] += x_k_1[i-2] / divider;
+				x_k_1[i] += x_k_1[i-2];
 			if (i + 2 < NUM)
-				x_k_1[i] += x_k[i+2] / divider;
-			if (i == NUM - 2)
-				x_k_1[i] += -x_k_1[0] / divider;
-			if (i == NUM - 1)
-				x_k_1[i] += -x_k_1[1] / divider;
+				x_k_1[i] += x_k[i+2];
+			
 			if (i == 0)
-				x_k_1[i] += -x_k[NUM - 2] / divider;
+				x_k_1[i] += -x_k[NUM - 2];
 			if (i == 1)
-				x_k_1[i] += -x_k[NUM - 1] / divider;
+				x_k_1[i] += -x_k[NUM - 1];
+
+			if (i == NUM - 2)
+				x_k_1[i] += -x_k_1[0];
+			if (i == NUM - 1)
+				x_k_1[i] += -x_k_1[1];
+
+			x_k_1[i] /= divider;
 
 			error_vect[i] = x_k_1[i] - x_k[i];
 		}
@@ -176,10 +182,10 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 int main()
 {
-	double *b = calloc(NUM, sizeof(double));
-	double *x_k = calloc(NUM, sizeof(double));
-	double *x_k_1 = calloc(NUM, sizeof(double));
-	double *error_vect = calloc(NUM, sizeof(double));
+	double *b = (double*)calloc(NUM, sizeof(double));
+	double *x_k = (double*)calloc(NUM, sizeof(double));
+	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
+	double *error_vect = (double*)calloc(NUM, sizeof(double));
 	int k_jacobi;
 	int k_gs;
 
@@ -191,8 +197,8 @@ int main()
 
 	free(x_k);
 	free(x_k_1);
-	x_k = calloc(NUM, sizeof(double));
-	x_k_1 = calloc(NUM, sizeof(double));
+	x_k = (double*)calloc(NUM, sizeof(double));
+	x_k_1 = (double*)calloc(NUM, sizeof(double));
 
 	k_gs = gauss_seidel(b, x_k, x_k_1, error_vect);
 	printf("Gauss-Seidel: %2d iterations\n", k_gs);
