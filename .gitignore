@@ -1,4 +1,3 @@
-linear-systems/gs
-linear-systems/jacobi
+linear-systems/linear
 build/
 *.txt
