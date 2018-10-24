@@ -6,3 +6,5 @@ os:
 script:
  - cd linear-systems
  - bash test.sh
+ - bash build.sh
+ - cd build && make linear
