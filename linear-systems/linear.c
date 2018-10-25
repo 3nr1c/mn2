@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
 
 		/** BEGIN TEST **/
 		if (test_matrix_error(b, x_k, error_vect, 1) < min_sor_error) {
-			min_sor_error = test_matrix_error(b, x_k, error_vect, 1);
+			min_sor_error = test_matrix_error(b, x_k, error_vect, 0);
 			write_vector(x_k, "sor.txt");
 		}
 		/** END TEST **/
