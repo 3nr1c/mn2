@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define NUM 1000000
 #define MAX_ERROR 10e-12
+int NUM = 1000000;
 
 double norma_inf_vect(double *v);
 void fillB(double *b);
@@ -42,22 +42,25 @@ void test_matrix_error(double *b, double *v, double *error_vect)
 	for (i = 0; i < NUM; i++) {
 		divider = (double)(!(i % 2) ? 3 : 4);
 
-		error_vect[i] = b[i] - divider * v[i];
-		if (i + 2 < NUM)
-			error_vect[i] += v[i+2];
-		if (i - 2 < NUM)
-			error_vect[i] += v[i-2];
+		error_vect[i] = divider * v[i];
+		if (i + 2 < NUM) 
+			error_vect[i] += -v[i+2];
+		if (i - 2 >= 0) 
+			error_vect[i] += -v[i-2];
 
-		if (i == 0)
-			error_vect[i] -= v[NUM - 2];
+		if (i == 0) 
+			error_vect[i] += v[NUM - 2];
 		if (i == 1)
-			error_vect[i] -= v[NUM - 1];
+			error_vect[i] += v[NUM - 1];
 
 		if (i == NUM - 2)
-			error_vect[i] -= v[0];
+			error_vect[i] += v[0];
 		if (i == NUM - 1)
-			error_vect[i] -= v[1];
+			error_vect[i] += v[1];
+
+		error_vect[i] -= b[i];
 	}
+	//printf("%.13lf\n", norma_inf_vect(error_vect));
 	assert(norma_inf_vect(error_vect) < TEST_ERROR);
 }
 /** END TEST **/
@@ -180,8 +183,13 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 	return k;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	/** BEGIN TEST **/
+	if (argc > 1) {
+		NUM = atoi(argv[1]);
+	}
+	/** END TEST **/
 	double *b = (double*)calloc(NUM, sizeof(double));
 	double *x_k = (double*)calloc(NUM, sizeof(double));
 	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
