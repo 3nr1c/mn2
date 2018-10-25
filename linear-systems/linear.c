@@ -97,6 +97,14 @@ void swap(double **a, double **b)
 	*b = temp;
 }
 
+void zeros(double *v)
+{
+	int i;
+	for (i = 0; i < NUM; i++) {
+		v[i] = 0;
+	}
+}
+
 int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 {
 	double divider;
@@ -252,19 +260,13 @@ int main(int argc, char *argv[])
 
 	k_jacobi = jacobi(b, x_k, x_k_1, error_vect);
 	printf("Jacobi: %2d iterations\n", k_jacobi);
-
-	for (i = 0; i < NUM; i++) {
-		x_k[i] = 0;
-		x_k_1[i] = 0;
-	}
+	zeros(x_k);
+	zeros(x_k_1);
 
 	k_gs = gauss_seidel(b, x_k, x_k_1, error_vect);
 	printf("Gauss-Seidel: %2d iterations\n", k_gs);
-
-	for (i = 0; i < NUM; i++) {
-		x_k[i] = 0;
-		x_k_1[i] = 0;
-	}
+	zeros(x_k);
+	zeros(x_k_1);
 
 	for (w = incr; w < 2; w += incr) {
 		k_sor = sor(b, x_k, x_k_1, error_vect, w);
@@ -276,10 +278,8 @@ int main(int argc, char *argv[])
 			write_vector(x_k, "sor.txt");
 		}
 		/** END TEST **/
-		for (i = 0; i < NUM; i++) {
-			x_k[i] = 0;
-			x_k_1[i] = 0;
-		}
+		zeros(x_k);
+		zeros(x_k_1);
 	}
 
 	free(b);
