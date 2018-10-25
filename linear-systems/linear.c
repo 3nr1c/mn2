@@ -115,7 +115,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// iterations
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -159,7 +159,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// actual iteration
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -203,7 +203,7 @@ int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 
 	// actual iteration
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 	double *x_k = (double*)calloc(NUM, sizeof(double));
 	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
 	double *error_vect = (double*)calloc(NUM, sizeof(double));
-	int k_jacobi, k_gs, k_sor, i;
+	int k_jacobi, k_gs, k_sor;
 	double w;
 	double incr = 0.1;
 
