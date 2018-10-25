@@ -186,8 +186,7 @@ int main()
 	double *x_k = (double*)calloc(NUM, sizeof(double));
 	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
 	double *error_vect = (double*)calloc(NUM, sizeof(double));
-	int k_jacobi;
-	int k_gs;
+	int k_jacobi, k_gs, i;
 
 	// create b vector
 	fillB(b);
@@ -195,10 +194,10 @@ int main()
 	k_jacobi = jacobi(b, x_k, x_k_1, error_vect);
 	printf("Jacobi: %2d iterations\n", k_jacobi);
 
-	free(x_k);
-	free(x_k_1);
-	x_k = (double*)calloc(NUM, sizeof(double));
-	x_k_1 = (double*)calloc(NUM, sizeof(double));
+	for (i = 0; i < NUM; i++) {
+		x_k[i] = 0;
+		x_k_1[i] = 0;
+	}
 
 	k_gs = gauss_seidel(b, x_k, x_k_1, error_vect);
 	printf("Gauss-Seidel: %2d iterations\n", k_gs);
