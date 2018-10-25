@@ -1,3 +1,4 @@
 linear-systems/linear
 build/
-*.txt
+linear-systems/*.txt
+linear-systems/test-assets/b_test.txt

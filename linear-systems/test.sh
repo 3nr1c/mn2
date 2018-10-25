@@ -2,5 +2,5 @@ make linear
 
 ./linear
 
-diff b.txt test_assets/test_b.txt
+shasum -a 256 b.txt | diff test-assets/b_sha256.txt -
 diff jacobi.txt gs.txt
