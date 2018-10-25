@@ -34,7 +34,7 @@ void write_vector(double *v, char *file)
 	fclose(fp);
 }
 
-void test_matrix_error(double *b, double *v, double *error_vect)
+double test_matrix_error(double *b, double *v, double *error_vect, int skip_assert)
 {
 	int i;
 	double divider;
@@ -60,8 +60,10 @@ void test_matrix_error(double *b, double *v, double *error_vect)
 
 		error_vect[i] -= b[i];
 	}
-	//printf("%.13lf\n", norma_inf_vect(error_vect));
-	assert(norma_inf_vect(error_vect) < TEST_ERROR);
+	//printf("Error: %.13lf\n", norma_inf_vect(error_vect));
+	assert(skip_assert || norma_inf_vect(error_vect) < TEST_ERROR);
+
+	return norma_inf_vect(error_vect);
 }
 /** END TEST **/
 
@@ -105,7 +107,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// iterations
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -133,7 +135,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 	}
 	/** BEGIN TEST **/
 	write_vector(x_k, "jacobi.txt");
-	test_matrix_error(b, x_k, error_vect);
+	test_matrix_error(b, x_k, error_vect, 0);
 	/** END TEST **/
 
 	return k;
@@ -177,7 +179,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 	}
 	/** BEGIN TEST **/
 	write_vector(x_k, "gs.txt");
-	test_matrix_error(b, x_k, error_vect);
+	test_matrix_error(b, x_k, error_vect, 0);
 	/** END TEST **/
 
 	return k;
@@ -185,9 +187,44 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 {
-	int k;
+	double divider;
+	int i,k;
 
+	// set the norm to 1 to avoid skipping any iterations
+	error_vect[0] = 1;
+
+	// actual iteration
 	k = 0;
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
+		for (i = 0; i < NUM; i++) {
+			divider = (double)(!(i % 2) ? 3 : 4);
+
+			x_k_1[i] = b[i];
+			if (i - 2 >= 0) 
+				x_k_1[i] += x_k_1[i-2];
+			if (i + 2 < NUM)
+				x_k_1[i] += x_k[i+2];
+			
+			if (i == 0)
+				x_k_1[i] += -x_k[NUM - 2];
+			if (i == 1)
+				x_k_1[i] += -x_k[NUM - 1];
+
+			if (i == NUM - 2)
+				x_k_1[i] += -x_k_1[0];
+			if (i == NUM - 1)
+				x_k_1[i] += -x_k_1[1];
+
+			x_k_1[i] *= w/divider;
+			x_k_1[i] -= w * x_k[i];
+
+			x_k_1[i] += x_k[i];
+
+			error_vect[i] = x_k_1[i] - x_k[i];
+		}
+		swap(&x_k, &x_k_1);
+	}
+
 	return k;
 }
 
@@ -197,6 +234,7 @@ int main(int argc, char *argv[])
 	if (argc > 1) {
 		NUM = atoi(argv[1]);
 	}
+	double min_sor_error = 10e6;
 	/** END TEST **/
 	double *b = (double*)calloc(NUM, sizeof(double));
 	double *x_k = (double*)calloc(NUM, sizeof(double));
@@ -231,6 +269,17 @@ int main(int argc, char *argv[])
 	for (w = incr; w < 2; w += incr) {
 		k_sor = sor(b, x_k, x_k_1, error_vect, w);
 		printf("SOR: %2d iterations with %.1lf\n", k_sor, w);
+
+		/** BEGIN TEST **/
+		if (test_matrix_error(b, x_k, error_vect, 1) < min_sor_error) {
+			min_sor_error = test_matrix_error(b, x_k, error_vect, 1);
+			write_vector(x_k, "sor.txt");
+		}
+		/** END TEST **/
+		for (i = 0; i < NUM; i++) {
+			x_k[i] = 0;
+			x_k_1[i] = 0;
+		}
 	}
 
 	free(b);
