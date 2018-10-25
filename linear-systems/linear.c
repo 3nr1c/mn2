@@ -183,6 +183,14 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 	return k;
 }
 
+int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
+{
+	int k;
+
+	k = 0;
+	return k;
+}
+
 int main(int argc, char *argv[])
 {
 	/** BEGIN TEST **/
@@ -194,7 +202,9 @@ int main(int argc, char *argv[])
 	double *x_k = (double*)calloc(NUM, sizeof(double));
 	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
 	double *error_vect = (double*)calloc(NUM, sizeof(double));
-	int k_jacobi, k_gs, i;
+	int k_jacobi, k_gs, k_sor, i;
+	double w;
+	double incr = 0.1;
 
 	// create b vector
 	fillB(b);
@@ -212,6 +222,16 @@ int main(int argc, char *argv[])
 
 	k_gs = gauss_seidel(b, x_k, x_k_1, error_vect);
 	printf("Gauss-Seidel: %2d iterations\n", k_gs);
+
+	for (i = 0; i < NUM; i++) {
+		x_k[i] = 0;
+		x_k_1[i] = 0;
+	}
+
+	for (w = incr; w < 2; w += incr) {
+		k_sor = sor(b, x_k, x_k_1, error_vect, w);
+		printf("SOR: %2d iterations with %.1lf\n", k_sor, w);
+	}
 
 	free(b);
 	free(x_k);
