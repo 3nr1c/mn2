@@ -3,6 +3,7 @@
 #include <math.h>
 
 #define MAX_ERROR 10e-12
+#define MAX_ITER 1000
 int NUM = 1000000;
 
 double norma_inf_vect(double *v);
@@ -115,7 +116,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// iterations
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 500) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -159,7 +160,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// actual iteration
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -203,7 +204,7 @@ int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 
 	// actual iteration
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
+	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
