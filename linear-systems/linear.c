@@ -16,7 +16,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect);
 
 #undef MAX_ERROR
 #define MAX_ERROR 10e-16
-#define TEST_ERROR 2
+#define TEST_ERROR 10e-12
 
 
 void write_vector(double *v, char *file)
@@ -104,7 +104,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 	k = 0;
 	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
 		for (i = 0; i < NUM; i++) {
-			divider = (double)(1 + i % 2 ? 3 : 4);
+			divider = (double)(!(i % 2) ? 3 : 4);
 
 			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
@@ -148,7 +148,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 	k = 0;
 	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < 1000) {
 		for (i = 0; i < NUM; i++) {
-			divider = (double)(1 + i % 2 ? 3 : 4);
+			divider = (double)(!(i % 2) ? 3 : 4);
 
 			x_k_1[i] = b[i];
 			if (i - 2 >= 0) 
@@ -190,6 +190,9 @@ int main()
 
 	// create b vector
 	fillB(b);
+	/** BEGIN TEST **/
+	write_vector(b, "b.txt");
+	/** END TEST **/
 
 	k_jacobi = jacobi(b, x_k, x_k_1, error_vect);
 	printf("Jacobi: %2d iterations\n", k_jacobi);
