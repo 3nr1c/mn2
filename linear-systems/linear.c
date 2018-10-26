@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define MAX_ERROR 10e-12
+#define MAX_ERROR 1e-12
 #define MAX_ITER 1000
 int NUM = 1000000;
 
@@ -11,13 +11,14 @@ void fillB(double *b);
 void swap(double **a, double **b);
 int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect);
 int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect);
+int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w);
 /** BEGIN TEST **/
 
 #include <assert.h>
 
 #undef MAX_ERROR
-#define MAX_ERROR 10e-16
-#define TEST_ERROR 10e-12
+#define MAX_ERROR 1e-16
+#define TEST_ERROR 1e-12
 
 
 void write_vector(double *v, char *file)
