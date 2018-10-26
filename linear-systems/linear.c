@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define MAX_ERROR 1e-12
-#define MAX_ITER 1000
+#define MAX_ITER 9999
 int NUM = 1000000;
 
 double norma_inf_vect(double *v);
@@ -17,7 +17,7 @@ int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w);
 #include <assert.h>
 
 #undef MAX_ERROR
-#define MAX_ERROR 1e-16
+#define MAX_ERROR 1e-14
 #define TEST_ERROR 1e-12
 
 
@@ -117,7 +117,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// iterations
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
