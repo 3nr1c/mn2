@@ -69,6 +69,9 @@ double test_matrix_error(double *b, double *v, double *error_vect, int skip_asse
 }
 /** END TEST **/
 
+/**
+ * Computes the max norm of a vector of size NUM
+ */
 double norma_inf_vect(double *v) 
 {
 	int i = 0;
@@ -81,6 +84,9 @@ double norma_inf_vect(double *v)
 	return max;
 }
 
+/**
+ * Initialization of the independent column vector 
+ */
 void fillB(double *b) 
 {
 	int i;
@@ -92,6 +98,10 @@ void fillB(double *b)
 	}
 }
 
+/**
+ * Interchanges two pointers
+ * Usage: swap(&a, &b)
+ */
 void swap(double **a, double **b)
 {
 	double *temp = *a;
@@ -99,6 +109,10 @@ void swap(double **a, double **b)
 	*b = temp;
 }
 
+/**
+ * Fills a vector of size NUM with zeros.
+ * Needed to reset x_k and x_k_1 between algorithms
+ */
 void zeros(double *v)
 {
 	int i;
@@ -107,6 +121,9 @@ void zeros(double *v)
 	}
 }
 
+/**
+ * Implementation of the Jacobi method
+ */
 int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 {
 	double divider;
@@ -122,6 +139,8 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 			divider = (double)(!(i % 2) ? 3 : 4);
 
 			x_k_1[i] = b[i];
+
+			// Matrix multiplication
 			if (i - 2 >= 0) 
 				x_k_1[i] += x_k[i-2];
 			if (i + 2 < NUM)
@@ -141,6 +160,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 			error_vect[i] = x_k_1[i] - x_k[i];
 		}
+		// Change vector pointers
 		swap(&x_k, &x_k_1);
 	}
 	/** BEGIN TEST **/
@@ -148,9 +168,13 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 	test_matrix_error(b, x_k, error_vect, 0);
 	/** END TEST **/
 
+	// Return the number of iterations
 	return k;
 }
 
+/**
+ * Implementation of the Gauss-Seidel method
+ */
 int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 {	
 	double divider;
@@ -166,6 +190,9 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 			divider = (double)(!(i % 2) ? 3 : 4);
 
 			x_k_1[i] = b[i];
+			
+			// Matrix multiplication,
+			// but using also x_k_1 values
 			if (i - 2 >= 0) 
 				x_k_1[i] += x_k_1[i-2];
 			if (i + 2 < NUM)
@@ -185,6 +212,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 			error_vect[i] = x_k_1[i] - x_k[i];
 		}
+		// Change vector pointers
 		swap(&x_k, &x_k_1);
 	}
 	/** BEGIN TEST **/
@@ -192,9 +220,13 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 	test_matrix_error(b, x_k, error_vect, 0);
 	/** END TEST **/
 
+	// Return the number of iterations
 	return k;
 }
 
+/**
+ * Implementation of the SOR method
+ */
 int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 {
 	double divider;
@@ -232,9 +264,11 @@ int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 
 			error_vect[i] = x_k_1[i] - x_k[i];
 		}
+		// Change vector pointers
 		swap(&x_k, &x_k_1);
 	}
 
+	// Return the number of iterations
 	return k;
 }
 
@@ -246,6 +280,7 @@ int main(int argc, char *argv[])
 	}
 	double min_sor_error = 10e6;
 	/** END TEST **/
+	// Memory initialization
 	double *b = (double*)calloc(NUM, sizeof(double));
 	double *x_k = (double*)calloc(NUM, sizeof(double));
 	double *x_k_1 = (double*)calloc(NUM, sizeof(double));
@@ -260,19 +295,28 @@ int main(int argc, char *argv[])
 	write_vector(b, "b.txt");
 	/** END TEST **/
 
+	// Jacobi method
 	k_jacobi = jacobi(b, x_k, x_k_1, error_vect);
 	printf("Jacobi: %2d iterations\n", k_jacobi);
+
+	// Reset vectors to zero (if not, the next algorithm
+	// will exit in 1 or 2 iterations)
 	zeros(x_k);
 	zeros(x_k_1);
 
+	// Gauss-Seidel method
 	k_gs = gauss_seidel(b, x_k, x_k_1, error_vect);
 	printf("Gauss-Seidel: %2d iterations\n", k_gs);
+
+	// Reset vectors to zero (if not, the next algorithm
+	// will exit in 1 or 2 iterations)
 	zeros(x_k);
 	zeros(x_k_1);
 
 	for (w = 0.1; w < 2; w += incr) {
+		// SOR method
 		k_sor = sor(b, x_k, x_k_1, error_vect, w);
-		printf("SOR: %2d iterations with %.3lf\n", k_sor, w);
+		printf("SOR: %3d iterations with %.3lf\n", k_sor, w);
 
 		/** BEGIN TEST **/
 		if (test_matrix_error(b, x_k, error_vect, 1) < min_sor_error) {
@@ -280,10 +324,13 @@ int main(int argc, char *argv[])
 			write_vector(x_k, "sor.txt");
 		}
 		/** END TEST **/
+		// Reset vectors to zero (if not, the next algorithm
+		// will exit in 1 or 2 iterations)
 		zeros(x_k);
 		zeros(x_k_1);
 	}
 
+	// Free all allocated vectors
 	free(b);
 	free(x_k);
 	free(x_k_1);
