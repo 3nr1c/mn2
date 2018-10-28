@@ -117,7 +117,7 @@ int jacobi(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// iterations
 	k = 0;
-	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k <= MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -161,7 +161,7 @@ int gauss_seidel(double *b, double *x_k, double *x_k_1, double *error_vect)
 
 	// actual iteration
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k <= MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -205,7 +205,7 @@ int sor(double *b, double *x_k, double *x_k_1, double *error_vect, double w)
 
 	// actual iteration
 	k = 0;
-	while (norma_inf_vect(error_vect) >= MAX_ERROR && ++k < MAX_ITER) {
+	while (2 * norma_inf_vect(error_vect) >= MAX_ERROR && ++k <= MAX_ITER) {
 		for (i = 0; i < NUM; i++) {
 			divider = (double)(!(i % 2) ? 3 : 4);
 
@@ -270,9 +270,9 @@ int main(int argc, char *argv[])
 	zeros(x_k);
 	zeros(x_k_1);
 
-	for (w = incr; w < 2; w += incr) {
+	for (w = 0.1; w < 2; w += incr) {
 		k_sor = sor(b, x_k, x_k_1, error_vect, w);
-		printf("SOR: %2d iterations with %.1lf\n", k_sor, w);
+		printf("SOR: %2d iterations with %.3lf\n", k_sor, w);
 
 		/** BEGIN TEST **/
 		if (test_matrix_error(b, x_k, error_vect, 1) < min_sor_error) {
