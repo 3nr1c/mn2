@@ -12,7 +12,7 @@ void fill_matrix(double **A)
 
 		// fill the matrix however you like
 		for (int j = 0; j < NUM; j++) {
-			A[i][j] = (double)(i + 2*j + i*i);
+			A[i][j] = (double)((i+1) * (j+1));
 		}
 	}
 }
@@ -70,18 +70,11 @@ int main(int argc, char const *argv[])
 	double prev_eigenvalue = 1e2;
 	double error = 1;
 	int k = 0;
-	char seed[4];
-	FILE *fp;
-
-	fp = fopen("/dev/urandom", "r");
-	fread(&seed, 1, 4, fp);
-	fclose(fp);
-	printf("Using seed %d\n", (int)seed);
 
 	fill_matrix(A);
 	print_matrix(A);
 
-	srandom((int)seed);
+	srandom(3356190956);
 
 	// fill y and z
 	for (int i = 0; i < NUM; i++) {
