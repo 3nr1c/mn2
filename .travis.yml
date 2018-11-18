@@ -9,3 +9,5 @@ script:
  - bash build.sh
  - cd build && make linear
  - ./linear
+ - cd ../../curves
+ - bash test.sh

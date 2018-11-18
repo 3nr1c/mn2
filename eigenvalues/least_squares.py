@@ -17,7 +17,7 @@ def generate_combinations(xy_list, N):
 		yield [xy_list[rand_x][0], xy_list[rand_y][1]]
 
 def get_random():
-	return uniform(0, 2)
+	return uniform(0,2)
 
 def generate_random_xy(N):
 	for i in range(N):
@@ -36,21 +36,29 @@ def genetic(sample_size=100, mutation_prob=0.1, keep_best=30):
 	sample = list(generate_random_xy(100))
 	offspring_size = sample_size - keep_best
 
+	mutation_prob_ = mutation_prob
+	prev_fitness = 0
+
 	k = 0
 	while True:
 		k += 1
-		fitness = [[xy, fit(xy)] for xy in sample]
+		fitness = [(xy, fit(xy)) for xy in sample]
 		fitness.sort(key=lambda x: x[1], reverse=False)
 
-		if k % 1000 == 0:
+		if k % 10 == 0:
 			print("{}: Best pair ({}, {}) with fitness {}" \
 				.format(k, fitness[0][0][0], fitness[0][0][1], fitness[0][1]))
+			if fitness[0][1] == prev_fitness:
+				mutation_prob_ = min(1.2 * mutation_prob_, 0.9)
+			else:
+				mutation_prob_ = mutation_prob
+			prev_fitness = fitness[0][1]
 
 		sample = [x[0] for x in fitness[:keep_best]]
 
 		for x in generate_combinations(sample, offspring_size):
-			sample.append(mutate(x, mutation_prob))
+			sample.append(mutate(x, mutation_prob_))
 
 if __name__ == "__main__":
-	genetic(mutation_prob=0.7, keep_best=100, sample_size=500)
+	genetic(mutation_prob=0.5, keep_best=400, sample_size=20000)
 
