@@ -7,6 +7,7 @@ script:
  - cd curves
  - bash test.sh 2> /dev/null
  - bash build.sh 
+ - cp Makefile build/Makefile
  - cd build && make curves
  - ./curves 2> /dev/null
  - cd ../../linear-systems
