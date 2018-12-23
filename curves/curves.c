@@ -176,7 +176,7 @@ int main()
 	test();
 	/** END TEST **/
 	double delta = 0.01;
-	int i
+	int i;
 
 	// temp storage for the current point
 	double *point = (double *)calloc(2, sizeof(double));
