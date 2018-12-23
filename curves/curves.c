@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+/** BEGIN TEST **/
 #include <assert.h>
+/** BEGIN TEST **/
 
 #define TOL 1e-10
 #define MAX_ITER 1000
 #define ERROR 1e6
 
-/**
+/*
  * Computes the dot product (scalar product)
  * of two vectors of $\mathbb{R}^2$
  */
@@ -16,7 +18,7 @@ double dot_product(double *x, double *y)
 	return x[0]*y[0] + x[1]*y[1];
 }
 
-/**
+/*
  * Compute the value of f(x,y)
  */
 double f(double x, double y)
@@ -26,7 +28,7 @@ double f(double x, double y)
 		- 3.2*pow(y,3) - 7.22*pow(x,2) - 16*x*y - 15.22*pow(y,2) + 20.8*x + 25.6*y - 5.94;
 }
 
-/**
+/*
  * Compute the partial derivative
  * $\frac{\partial f}{\partial x}$ at (x,y)
  */
@@ -36,7 +38,7 @@ double df_x(double x, double y)
 		-2.6*pow(y,2) - 14.44*x - 16*y + 20.8;
 }
 
-/**
+/*
  * Compute the partial derivative
  * $\frac{\partial f}{\partial y}$ at (x,y)
  */
@@ -46,7 +48,7 @@ double df_y(double x, double y)
 		-5.2*x*y - 9.6*pow(y,2) - 16*x - 30.44*y + 25.6;
 }
 
-/**
+/*
  * Computes the gradient of f at (x,y)
  */
 void grad_f(double x, double y, double *result)
@@ -55,7 +57,7 @@ void grad_f(double x, double y, double *result)
 	result[1] = df_y(x, y);
 }
 
-/**
+/*
  * Uses Newton's method to find a first
  * approximation (x,0) near (x0,0)
  */
@@ -73,7 +75,7 @@ double first_approx_x(double x0)
 	return x1;
 }
 
-/**
+/*
  * Uses Newton's method to find a first
  * approximation (0,y) near (0,y0)
  */
@@ -90,7 +92,7 @@ double first_approx_y(double y0)
 	return y1;
 }
 
-/**
+/*
  * Given a point (x0,y0) on the curve f(x,y)=0
  * and a first approximation (x1,y1) at a distance
  * about h from (x0,y0), uses Newton's method
@@ -134,7 +136,7 @@ void newton_next_point(double x0, double y0,
 	result[1] = y1;
 }
 
-/**
+/*
  * Given a point on the curve f(x,y)=0
  * finds a vector tangent to the curve
  * with norm 1

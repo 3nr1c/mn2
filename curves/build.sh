@@ -1,5 +1,5 @@
 function removeTest {
-	sed 's|/\*\* BEGIN TEST \*\*/|\n&|g;s|/\*\* END TEST \*\*/|&\n|g' $1 | sed '/\/\*/,/*\//d' > $2
+	sed 's|/\*\* BEGIN TEST \*\*/|\n&|g;s|/\*\* END TEST \*\*/|&\n|g' $1 | sed '/\/\*\*/,/*\//d' > $2
 }
 
 if [ ! -d "build" ]; then
