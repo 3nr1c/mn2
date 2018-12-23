@@ -2,3 +2,4 @@ linear-systems/linear
 build/
 linear-systems/*.txt
 linear-systems/test-assets/b_test.txt
+curves/curves

@@ -5,30 +5,34 @@
 
 #define TOL 1e-10
 
+double dot_product(double *x, double *y)
+{
+	return x[0]*y[0] + x[1]*y[1];
+}
+
+double norm_inf(double a, double b) 
+{
+	if (fabs(a) > fabs(b)) return fabs(a);
+	else return fabs(b);
+}
+
 double f(double x, double y)
 {
-	double x2 = x*x;
-	double y2 = y*y;
-	return x2*x2 + 2*x*x2*y + 3*x2*y2 + 2*x*y*y2 + 2*y2*y2 - 2.6*x*x2 - 3.2*x2*y
-		-2.6*x*y2 - 3.2*y*y2 - 7.22*x2 - 16*x*y - 15.22*y2 + 20.8*x + 25.6*y - 5.94;
+	return pow(x,4) + 2*pow(x,3)*y + 3*pow(x,2)*pow(y,2) + 2*x*pow(y,3) 
+		+ 2*pow(y,4) - 2.6*pow(x,3) - 3.2*pow(x,2)*y -2.6*x*pow(y,2)
+		- 3.2*pow(y,3) - 7.22*pow(x,2) - 16*x*y - 15.22*pow(y,2) + 20.8*x + 25.6*y - 5.94;
 }
 
 double df_x(double x, double y)
 {
-	double x2 = x*x;
-	double y2 = y*y;
-
-	return 4*x*x2 + 6*x2*y + 6*x*y2 + 0 + 0 + 7.8*x2 - 6.4*x*y
-		-2.6*y2 - 0 - 14.44*x - 16*y - 0 + 20.8 + 0 - 0;
+	return 4*pow(x,3) + 6*pow(x,2)*y + 6*x*pow(y,2) + 2*pow(y,3) - 7.8*pow(x,2) - 6.4*x*y
+		-2.6*pow(y,2) - 14.44*x - 16*y + 20.8;
 }
 
 double df_y(double x, double y)
 {
-	double x2 = x*x;
-	double y2 = y*y;
-
-	return 0 + 2*x*x2 + 6*x2*y + 6*x*y2 + 8*y*y2 - 0 - 3.2*x2
-		-5.2*x*y - 9.6*y2 - 0 - 16*x - 30.44*y + 0 + 25.6 - 0;
+	return 2*pow(x,3) + 6*pow(x,2)*y + 6*x*pow(y,2) + 8*pow(y,3) - 3.2*pow(x,2)
+		-5.2*x*y - 9.6*pow(y,2) - 16*x - 30.44*y + 25.6;
 }
 
 void grad_f(double x, double y, double *result)
@@ -40,13 +44,12 @@ void grad_f(double x, double y, double *result)
 double first_approx_x(double x0)
 {
 	int n = 20;
-	double x1, error;
+	double x1;
 	
 	do {
 		x1 = x0 - f(x0, 0) / df_x(x0, 0);
-		error = x1 - x0;
 		x0 = x1;
-	} while (fabs(error) >= TOL && --n > 0);
+	} while (fabs(f(x0, 0)) >= TOL && --n > 0);
 
 	return x1;
 }
@@ -54,13 +57,12 @@ double first_approx_x(double x0)
 double first_approx_y(double y0)
 {
 	int n = 20;
-	double y1, error;
+	double y1;
 	
 	do {
 		y1 = y0 - f(0, y0) / df_y(0, y0);
-		error = y1 - y0;
 		y0 = y1;
-	} while (fabs(error) >= TOL && --n > 0);
+	} while (fabs(f(0,y0)) >= TOL && --n > 0);
 
 	return y1;
 }
@@ -73,28 +75,45 @@ void newton_step(double x0, double y0,
 	double detH;
 	double *partial_f = (double*)calloc(2, sizeof(double));
 	double x2, y2;
-	int n = 1000;
+	int n = 100;
+	double incr_x, incr_y;
 	
-	do {
+	while (fabs(f(x1,y1)) >= TOL 
+		   //&& fabs((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0) - h*h) > TOL 
+		   && --n > 0) {
 		H[0] = f(x1, y1);
-		H[1] = (x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0) - h*h;
+		H[1] = pow(x1 - x0, 2) + pow(y1 - y0, 2) - pow(h,2);
+	
 		grad_f(x1, y1, partial_f);
-
 		detH = 2*(y1 - y0)*partial_f[0] - 2*(x1 - x0)*partial_f[1];
 
-		x2 = x1 - (2*(y1 - y0)*H[0] - partial_f[1]*H[1]) / detH;
-		y2 = y1 - (-2*(x1 - x0)*H[0] + partial_f[0]*H[1]) / detH;
+		incr_x = (2*(y1 - y0)*H[0] - partial_f[1]*H[1]) / detH;
+		incr_y = (-2*(x1 - x0)*H[0] + partial_f[0]*H[1]) / detH;
+
+		x2 = x1 - incr_x;
+		y2 = y1 - incr_y;
 
 		x1 = x2;
 		y1 = y2;
-	} while (fabs(f(x1,y1)) >= TOL 
-		   && fabs((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0) - h*h) >= TOL 
-		   && --n > 0);
+
+		//fprintf(stderr, "it%d (%.6lf, %.6lf)\n", n, x1, y1);
+	} 
 
 	free(partial_f);
 
 	result[0] = x1;
 	result[1] = y1;
+}
+
+void tangent(double *point, double *vect, double sign)
+{
+	double norm;
+
+	vect[0] = -sign*df_y(point[0], point[1]);
+	vect[1] = sign*df_x(point[0], point[1]);
+	norm = sqrt(pow(vect[0],2) + pow(vect[1],2));
+	vect[0] = vect[0]/norm;
+	vect[1] = vect[1]/norm;
 }
 
 /** BEGIN TEST **/
@@ -121,13 +140,24 @@ int main()
 	/** BEGIN TEST **/
 	test();
 	/** END TEST **/
-	double delta = 0.1;
+	double delta = 0.01;
+
+	// first points
 	double firstx = first_approx_x(0);
-	double firsty = first_approx_y(-3);
+	double firsty = first_approx_y(0);
+
+	// temp storage for the current point
 	double *results = (double *)calloc(2, sizeof(double));
-	double *yprime = (double *)calloc(2, sizeof(double));
 	double *prev = (double *)calloc(2, sizeof(double));
+	double *yprime = (double *)calloc(2, sizeof(double));
+
+	// store last iteration derivative to check we're going
+	// in the right direction
+	double *yprime0 = (double *)calloc(2, sizeof(double));
+	// this is to normalize the derivative vectors
 	double norm;
+
+
 	FILE* output = fopen("results.txt", "w");
 
 	results[0] = firstx;
@@ -136,36 +166,48 @@ int main()
 	//results[0] = 0;
 	//results[1] = firsty;
 
-	//yprime[0] = delta/2;
-	//yprime[1] = 0;
+	fprintf(output, "%.12lf %.12lf\n", results[0], results[1]);
+	fprintf(stderr, "(%.12lf, %.12lf); ", results[0], results[1]);
 
-	printf("%.12lf %.12lf\n", results[0], results[1]);
-	fprintf(stderr, "(%.12lf, %.12lf)\n", results[0], results[1]);
+
+	
 	for (int i = 0; i < 10000; i++) {
-		/*yprime[0] = (results[0] - prev[0]);
-		yprime[1] = (results[1] - prev[1]);
-		norm = sqrt(yprime[0]*yprime[0] + yprime[1]*yprime[1]);
-		yprime[0] = delta*yprime[0]/norm;
-		yprime[1] = delta*yprime[1]/norm;*/
 
-		yprime[0] = -df_y(results[0], results[1]);
-		yprime[1] = df_x(results[0], results[1]);
-		norm = sqrt(yprime[0]*yprime[0] + yprime[1]*yprime[1]);
-		yprime[0] = delta*yprime[0]/norm;
-		yprime[1] = delta*yprime[1]/norm;
+		/*if (i > 1) {
+			yprime[0] = results[0] - prev[0];
+			yprime[1] = results[1] - prev[1];
+			norm = sqrt(dot_product(yprime, yprime));
+			yprime[0] /= norm;
+			yprime[1] /= norm;
+		}*/
 
-		fprintf(stderr, "y' = (%.6lf, %.6lf); ", yprime[0], yprime[1]);
+		tangent(results, yprime, 1);
+		if (i > 0 && dot_product(yprime, yprime0) < 0) {
+			yprime[0] *= -1;
+			yprime[1] *= -1;
+		}
+		yprime0[0] = yprime[0];
+		yprime0[1] = yprime[1];
 
 		prev[0] = results[0];
 		prev[1] = results[1];
 
+		fprintf(stderr, "gradf(x,y) = (%.6lf, %.6lf); ", 
+				df_x(results[0], results[1]),
+				df_y(results[0], results[1]));
+		fprintf(stderr, "y' = (%.6lf, %.6lf)\n", yprime[0], yprime[1]);
+
+		
 		newton_step(results[0], results[1],
-					results[0] + yprime[0], results[1] + yprime[1],
+					results[0] + delta * yprime[0], results[1] + delta * yprime[1],
 					delta, results);
-		fprintf(stderr, "(%.12lf, %.12lf)\n", results[0], results[1]);
+		
+		fprintf(stderr, "(%.12lf, %.12lf); ", results[0], results[1]);
+
 		if (results[0] != results[0]
 			|| results[1] != results[1]
-			|| fabs(results[0])+fabs(results[1]) > 100) {
+			|| fabs(results[0]) + fabs(results[1]) > 10
+			|| fabs(f(results[0], results[1])) >= TOL) {
 			fprintf(stderr, "\nHALT AT %d STEPS\n", i);
 			break;
 		}
@@ -174,6 +216,9 @@ int main()
 
 	fclose(output);
 	free(results);
+	free(prev);
+	free(yprime);
+	free(yprime0);
 
 	return 0;
 }

@@ -11,3 +11,6 @@ script:
  - ./linear
  - cd ../../curves
  - bash test.sh
+ - bash build.sh
+ - cd build && make curves
+ - ./curves
