@@ -5,10 +5,10 @@ os:
 
 script:
  - cd curves
- - bash test.sh
- - bash build.sh
+ - bash test.sh 2> /dev/null
+ - bash build.sh 
  - cd build && make curves
- - ./curves
+ - ./curves 2> /dev/null
  - cd ../../linear-systems
  - bash test.sh
  - bash build.sh
