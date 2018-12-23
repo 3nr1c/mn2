@@ -1,2 +1,2 @@
 CFLAGS=-Wall -O2
-LFLAGS=-lm
+LDFLAGS=-lm
