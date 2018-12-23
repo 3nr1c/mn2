@@ -4,13 +4,13 @@ os:
  - osx
 
 script:
- - cd linear-systems
- - bash test.sh
- - bash build.sh
- - cd build && make linear
- - ./linear
- - cd ../../curves
+ - cd curves
  - bash test.sh
  - bash build.sh
  - cd build && make curves
  - ./curves
+ - cd ../../linear-systems
+ - bash test.sh
+ - bash build.sh
+ - cd build && make linear
+ - ./linear
