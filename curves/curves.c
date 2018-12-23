@@ -5,17 +5,18 @@
 
 #define TOL 1e-10
 
+/**
+ * Computes the dot product (scalar product)
+ * of two vectors of $\mathbb{R}^2$
+ */
 double dot_product(double *x, double *y)
 {
 	return x[0]*y[0] + x[1]*y[1];
 }
 
-double norm_inf(double a, double b) 
-{
-	if (fabs(a) > fabs(b)) return fabs(a);
-	else return fabs(b);
-}
-
+/**
+ * Compute the value of f(x,y)
+ */
 double f(double x, double y)
 {
 	return pow(x,4) + 2*pow(x,3)*y + 3*pow(x,2)*pow(y,2) + 2*x*pow(y,3) 
@@ -23,24 +24,39 @@ double f(double x, double y)
 		- 3.2*pow(y,3) - 7.22*pow(x,2) - 16*x*y - 15.22*pow(y,2) + 20.8*x + 25.6*y - 5.94;
 }
 
+/**
+ * Compute the partial derivative
+ * $\frac{\partial f}{\partial x}$ at (x,y)
+ */
 double df_x(double x, double y)
 {
 	return 4*pow(x,3) + 6*pow(x,2)*y + 6*x*pow(y,2) + 2*pow(y,3) - 7.8*pow(x,2) - 6.4*x*y
 		-2.6*pow(y,2) - 14.44*x - 16*y + 20.8;
 }
 
+/**
+ * Compute the partial derivative
+ * $\frac{\partial f}{\partial y}$ at (x,y)
+ */
 double df_y(double x, double y)
 {
 	return 2*pow(x,3) + 6*pow(x,2)*y + 6*x*pow(y,2) + 8*pow(y,3) - 3.2*pow(x,2)
 		-5.2*x*y - 9.6*pow(y,2) - 16*x - 30.44*y + 25.6;
 }
 
+/**
+ * Computes the gradient of f at (x,y)
+ */
 void grad_f(double x, double y, double *result)
 {
 	result[0] = df_x(x, y);
 	result[1] = df_y(x, y);
 }
 
+/**
+ * Uses Newton's method to find a first
+ * approximation (x,0) near (x0,0)
+ */
 double first_approx_x(double x0)
 {
 	int n = 20;
@@ -54,6 +70,10 @@ double first_approx_x(double x0)
 	return x1;
 }
 
+/**
+ * Uses Newton's method to find a first
+ * approximation (0,y) near (0,y0)
+ */
 double first_approx_y(double y0)
 {
 	int n = 20;
@@ -67,16 +87,21 @@ double first_approx_y(double y0)
 	return y1;
 }
 
+/**
+ * Given a point (x0,y0) on the curve f(x,y)=0
+ * and a first approximation (x1,y1) at a distance
+ * about h from (x0,y0), uses Newton's method
+ * to find another point on the curve
+ */
 void newton_step(double x0, double y0, 
 				 double x1, double y1, 
 				 double h, double *result)
 {
-	double H[2];
-	double detH;
+	double *H = (double*) calloc(2, sizeof(double));
 	double *partial_f = (double*)calloc(2, sizeof(double));
-	double x2, y2;
-	int n = 100;
+	double detH, x2, y2;
 	double incr_x, incr_y;
+	int n = 100;
 	
 	while (fabs(f(x1,y1)) >= TOL 
 		   //&& fabs((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0) - h*h) > TOL 
@@ -95,22 +120,26 @@ void newton_step(double x0, double y0,
 
 		x1 = x2;
 		y1 = y2;
-
-		//fprintf(stderr, "it%d (%.6lf, %.6lf)\n", n, x1, y1);
 	} 
 
+	free(H);
 	free(partial_f);
 
 	result[0] = x1;
 	result[1] = y1;
 }
 
-void tangent(double *point, double *vect, double sign)
+/**
+ * Given a point on the curve f(x,y)=0
+ * finds a vector tangent to the curve
+ * with norm 1
+ */
+void tangent(double *point, double *vect)
 {
 	double norm;
 
-	vect[0] = -sign*df_y(point[0], point[1]);
-	vect[1] = sign*df_x(point[0], point[1]);
+	vect[0] = -*df_y(point[0], point[1]);
+	vect[1] = *df_x(point[0], point[1]);
 	norm = sqrt(pow(vect[0],2) + pow(vect[1],2));
 	vect[0] = vect[0]/norm;
 	vect[1] = vect[1]/norm;
@@ -144,7 +173,7 @@ int main()
 
 	// first points
 	double firstx = first_approx_x(0);
-	double firsty = first_approx_y(0);
+	// double firsty = first_approx_y(0);
 
 	// temp storage for the current point
 	double *results = (double *)calloc(2, sizeof(double));
@@ -163,34 +192,17 @@ int main()
 	results[0] = firstx;
 	results[1] = 0;
 
-	//results[0] = 0;
-	//results[1] = firsty;
-
 	fprintf(output, "%.12lf %.12lf\n", results[0], results[1]);
 	fprintf(stderr, "(%.12lf, %.12lf); ", results[0], results[1]);
-
-
 	
 	for (int i = 0; i < 10000; i++) {
-
-		/*if (i > 1) {
-			yprime[0] = results[0] - prev[0];
-			yprime[1] = results[1] - prev[1];
-			norm = sqrt(dot_product(yprime, yprime));
-			yprime[0] /= norm;
-			yprime[1] /= norm;
-		}*/
-
-		tangent(results, yprime, 1);
+		tangent(results, yprime);
 		if (i > 0 && dot_product(yprime, yprime0) < 0) {
 			yprime[0] *= -1;
 			yprime[1] *= -1;
 		}
 		yprime0[0] = yprime[0];
 		yprime0[1] = yprime[1];
-
-		prev[0] = results[0];
-		prev[1] = results[1];
 
 		fprintf(stderr, "gradf(x,y) = (%.6lf, %.6lf); ", 
 				df_x(results[0], results[1]),
