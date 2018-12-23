@@ -5,6 +5,16 @@
 #include <assert.h>
 /** BEGIN TEST **/
 
+/*
+ * Enric Florit Zacarías
+ * Mètodes Numèrics II
+ *
+ * Compile with
+ * 	gcc -Wall curves.c -lm -o curves
+ * Visualize points with
+ *  echo "set grid; set size square; set size ratio -1;  plot 'results.txt' w l " | gnuplot
+ */
+
 #define TOL 1e-10
 #define MAX_ITER 1000
 #define ERROR 1e6
