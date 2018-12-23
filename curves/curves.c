@@ -4,6 +4,8 @@
 #include <math.h>
 
 #define TOL 1e-10
+#define MAX_ITER 1000
+#define ERROR 1e6
 
 /**
  * Computes the dot product (scalar product)
@@ -59,10 +61,11 @@ void grad_f(double x, double y, double *result)
  */
 double first_approx_x(double x0)
 {
-	int n = 20;
+	int n = MAX_ITER;
 	double x1;
 	
 	do {
+		if (df_x(x0, 0) == 0) return ERROR;
 		x1 = x0 - f(x0, 0) / df_x(x0, 0);
 		x0 = x1;
 	} while (fabs(f(x0, 0)) >= TOL && --n > 0);
@@ -76,7 +79,7 @@ double first_approx_x(double x0)
  */
 double first_approx_y(double y0)
 {
-	int n = 20;
+	int n = MAX_ITER;
 	double y1;
 	
 	do {
@@ -101,7 +104,7 @@ void newton_next_point(double x0, double y0,
 	double *partial_f = (double*)calloc(2, sizeof(double));
 	double detH, x2, y2;
 	double incr_x, incr_y;
-	int n = 1000;
+	int n = MAX_ITER;
 	
 	while ((fabs(f(x1,y1)) >= TOL 
 		   || fabs(pow(x1 - x0,2) + pow(y1 - y0,2) - pow(h,2)) >= TOL)
@@ -111,6 +114,8 @@ void newton_next_point(double x0, double y0,
 	
 		grad_f(x1, y1, partial_f);
 		detH = 2*(y1 - y0)*partial_f[0] - 2*(x1 - x0)*partial_f[1];
+
+		if (detH == 0) break; // ERROR
 
 		incr_x = (2*(y1 - y0)*H[0] - partial_f[1]*H[1]) / detH;
 		incr_y = (-2*(x1 - x0)*H[0] + partial_f[0]*H[1]) / detH;
@@ -141,6 +146,7 @@ void tangent(double *point, double *vect)
 	vect[0] = -df_y(point[0], point[1]);
 	vect[1] = df_x(point[0], point[1]);
 	norm = sqrt(pow(vect[0],2) + pow(vect[1],2));
+	if (norm == 0) return; // ERRROR
 	vect[0] = vect[0]/norm;
 	vect[1] = vect[1]/norm;
 }
