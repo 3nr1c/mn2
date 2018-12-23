@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <math.h>
+#include <assert.h>
 
 #define TOL 1e-10
 #define MAX_ITER 1000
@@ -176,6 +176,7 @@ int main()
 	test();
 	/** END TEST **/
 	double delta = 0.01;
+	int i
 
 	// temp storage for the current point
 	double *point = (double *)calloc(2, sizeof(double));
@@ -199,7 +200,7 @@ int main()
 	// Print the first point (debugging)
 	fprintf(stderr, "(%.12lf, %.12lf); ", point[0], point[1]);
 	
-	for (int i = 0; i < 10000; i++) {
+	for (i = 0; i < 10000; i++) {
 		// Compute tangent vector and change
 		// sign if necessary
 		tangent(point, tgt);
